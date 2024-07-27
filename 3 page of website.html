@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Alert Email Registration</title>
+    <style>
+        body {
+            background-image: url('images/stockimage.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        .centered {
+            font-size: 20px;
+            margin: 20px auto;
+            display: block;
+            text-align: center;
+            border-radius: 2px;
+            color: white;
+        }
+
+        .search {
+            margin-top: 20px;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: black;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+            margin-top: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="centered">Welcome to Stock Alert Email Registration</h1>
+        <p class="centered">Enter your email address to receive stock alerts from joepip699@gmail.com</p>
+        <form id="emailForm">
+            <input class="centered search" type="email" id="emailInput" name="email" placeholder="Enter Email" required>
+            <button class="centered" type="submit">Submit Email</button>
+        </form>
+        <p id="message" class="centered" style="display: none;"></p>
+        <a class="centered" href="/">Back to Home</a>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#emailForm').on('submit', function(e) {
+                e.preventDefault();
+                var email = $('#emailInput').val();
+                $.ajax({
+                    url: '/another-page',
+                    type: 'POST',
+                    data: {email: email},
+                    success: function(response) {
+                        $('#message').text('Email registered successfully! Check your inbox (including spam) for alerts.').show();
+                        $('#emailForm').hide();
+                    },
+                    error: function() {
+                        $('#message').text('An error occurred. Please try again.').show();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

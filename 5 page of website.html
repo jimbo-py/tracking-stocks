@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Congressional Stock Trades</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Congressional Stock Trades</h1>
+    <button onclick="fetchTrades()">Refresh Trades</button>
+    <table id="tradeTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Representative</th>
+                <th>Ticker</th>
+                <th>Transaction</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody id="tradeBody">
+            <tr>
+                <td colspan="5">Loading trade data...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function fetchTrades() {
+            fetch('/fetch-trades')
+                .then(response => response.json())
+                .then(trades => {
+                    const tradeBody = document.getElementById('tradeBody');
+                    tradeBody.innerHTML = '';
+                    trades.forEach(trade => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                             <td>${trade.representative}</td>
+                            <td>${trade.date}</td>
+                           
+                            <td>${trade.ticker}</td>
+                            <td>${trade.transaction}</td>
+                            <td>${trade.amount}</td>
+                        `;
+                        tradeBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const tradeBody = document.getElementById('tradeBody');
+                    tradeBody.innerHTML = '<tr><td colspan="5">Error loading trade data. Please try again.</td></tr>';
+                });
+        }
+
+        // Fetch trades when the page loads
+        document.addEventListener('DOMContentLoaded', fetchTrades);
+    </script>
+</body>
+</html>

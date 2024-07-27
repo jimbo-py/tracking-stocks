@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analysis: Intrinsic Value Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+            margin-right: 10px;
+        }
+        input[type="submit"] {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        #results {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        pre {
+            background-color: #f2f2f2;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .mi {
+          text-align: center;
+          padding: 20px;
+          color: white; 
+          background-color: rgba(0, 0, 0, 0.5);
+        }
+        .ml{
+          text-align: center;
+        }
+        .hallo{
+          text-align: center;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: inline-block;
+            margin: 10px;
+            
+        }
+        a:hover{
+          box-shadow: 0 0 11px rgba(33,33,33,.2);;
+        }
+    </style>
+</head>
+<body>
+  <a href="/">Back to Home</a>
+  <a href="/another-page">Stock Search</a>
+  <a href="/email-registration">Register for Email Alerts</a>
+
+    <h1 class = "mi">Stock Analysis: Intrinsic Value Calculator</h1>
+    <h2 class = 'ml'>Intrinsic Value is a method used by Warren Buffet and other investors to determine a stock's real price and see if it is worth investing. A market cap that is 70% of intrinsic value means the company is underpriced and is worth looking at.</h2>
+    <div class = "hallo">
+        <h2>Want to Learn About Intrinsic Value in More Depth?</h2>
+        <a href="https://www.youtube.com/watch?v=vNx9_6vlaRw" target="_blank">Watch this YouTube Video!</a>
+    </div>
+    <form id="stockForm" method="POST">
+        <label for="ticker">Enter Stock Ticker:</label>
+        <input type="text" id="ticker" name="ticker" required>
+        <input type="submit" value="Analyze">
+    </form>
+    <div id="results"></div>
+    <script>
+        document.getElementById('stockForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const ticker = document.getElementById('ticker').value;
+            fetch('/buffet-stock', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'ticker=' + encodeURIComponent(ticker)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('results');
+                
+                let historicalFCF = '';
+                for (let date in data.historical_fcf) {
+                    historicalFCF += `${date}: ${data.historical_fcf[date]} million\n`;
+                }
+                
+                resultsDiv.innerHTML = `
+                    <h2>Analysis Results for ${ticker}</h2>
+                    <h3>Historical Free Cash Flow Data (in millions):</h3>
+                    <pre>${historicalFCF}</pre>
+                    <h3>Projected Free Cash Flows (in millions):</h3>
+                    <pre>${JSON.stringify(data.projected_fcfs, null, 2)}</pre>
+                    <h3>Intrinsic Value:</h3>
+                    <p>$${data.intrinsic_value.toFixed(2)} billion USD</p>
+                    <h3>Suggested Market Cap (70% of Intrinsic Value):</h3>
+                    <p>$${data.suggested_value.toFixed(2)} billion USD</p>
+                `;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('results').innerHTML = '<p>An error occurred while analyzing the stock. Please try again.</p>';
+            });
+        });
+    </script>
+</body>
+</html>

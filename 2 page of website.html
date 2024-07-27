@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Stock Search</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+    body {
+    background-image: url('images/stockimage.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .centered {
+            font-size: 20px;
+            margin: 20px auto;
+            display: block;
+            text-align: center;
+            border-radius: 2px;
+            color: white; /* Adjust text color for better visibility on background */
+        }
+
+        .search {
+            margin-top: 20px;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: black;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent background for better readability */
+            border-radius: 10px;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        a:hover {
+            box-shadow: 0 0 11px rgba(33,33,33,.2);;
+        }
+    
+        table {  
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <h1 class="centered">Welcome to Stock Search</h1>
+        <p class="centered">Search any Stock</p>
+        <input class="centered search" type="text" id="searchInput" placeholder="Enter ticker symbol">
+        <button class="centered" onclick="searchStocks()">Search</button>
+        <a class="centered" href="/">Back to Home</a>
+        <a class="centered" href="/email-registration">Register for Email Alerts</a>
+        <a class = "centered" href="/buffet-stock"> Intrinsic Value Calculator</a>
+    </div>
+
+    <table id="stockTable">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Ticker</th>
+                <th>Price</th>
+                <th>Debt to Equity</th>
+                <th>ROE</th>
+                <th>PEG Ratio</th>
+                <th>Change Percentage</th>
+                <th>Recommendation</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <canvas id="stockChart"></canvas>
+
+    <script>
+        function searchStocks() {
+            var searchTerm = $('#searchInput').val();
+            console.log("Searching for:", searchTerm);
+            $.ajax({
+                url: '/another-page',
+                type: 'POST',
+                data: {search: searchTerm},
+                success: function(data) {
+                    console.log("Received data:", data);
+                    updateTable(data);
+                    updateChart(data);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error occurred:", error);
+                }
+            });
+        }
+
+        function updateTable(data) {
+            const tableBody = document.querySelector('#stockTable tbody');
+            tableBody.innerHTML = '';
+            
+            data.forEach(stock => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${stock.company}</td>
+                    <td>${stock.ticker}</td>
+                    <td>${stock.price}</td>
+                    <td>${stock.debtToEquity}</td>
+                    <td>${stock.roe}</td>
+                    <td>${stock.pegRatio}</td>
+                    <td>${stock.change_percentage}</td>
+                    <td>${stock.buy_recommendation}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function updateChart(data) {
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            const labels = data.map(stock => stock.ticker);
+            const prices = data.map(stock => stock.price);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stock Prices',
+                        data: prices,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initial load
+        $.ajax({
+            url: '/another-page',
+            type: 'GET',
+            success: function(data) {
+                updateTable(data);
+                updateChart(data);
+            }
+        });
+
+        // Update every minute
+        setInterval(function() {
+            $.ajax({
+                url: '/another-page',
+                type: 'GET',
+                success: function(data) {
+                    updateTable(data);
+                    updateChart(data);
+                }
+            });
+        }, 60000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel = "icon" href="/templates/images/stockimage.jpg" type = "image/jpeg">
+    <title>Stock Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-image: url('images/stockimage.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        table {  
+            border-collapse: collapse;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+            color: black;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .hero {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: inline-block;
+            margin: 10px;
+        }
+        #stockChart {
+            background-color: rgba(255, 255, 255, 0.8);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/another-page">Stock Search</a>
+    <a href="/email-registration">Register for Email Alerts</a>
+    <a href="/buffet-stock">Intrinsic Value Calculator</a>
+    <a href="/quizparatu"> Quiz </a>
+    <a href="/congress-per"> Congressional Stock Trades</a>
+    <h1 class="hero">Stock Tracker</h1>
+    <div>
+        <canvas id="stockChart"></canvas>
+    </div>
+    <table id="stockTable">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Ticker</th>
+                <th>Price</th>
+                <th>Debt to Equity</th>
+                <th>ROE</th>
+                <th>PEG Ratio</th>
+                <th>Change Percentage</th>
+                <th>Recommendation</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        function updateStockData() {
+            fetch('/api/stock-data')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#stockTable tbody');
+                    tableBody.innerHTML = '';
+                    
+                    data.forEach(stock => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${stock.company}</td>
+                            <td>${stock.ticker}</td>
+                            <td>${stock.price}</td>
+                            <td>${stock.debtToEquity}</td>
+                            <td>${stock.roe}</td>
+                            <td>${stock.pegRatio}</td>
+                            <td>${stock.change_percentage}</td>
+                            <td>${stock.buy_recommendation}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+
+                    updateChart(data);
+                });
+        }
+
+        function updateChart(data) {
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            const labels = data.map(stock => stock.ticker);
+            const prices = data.map(stock => stock.price);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stock Prices',
+                        data: prices,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        updateStockData();
+        setInterval(updateStockData, 60000); // Update every minute
+    </script>
+</body>
+</html>
+
+
