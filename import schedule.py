@@ -275,7 +275,7 @@ def email_alert(subject, body, to, images):
     msg['To'] = to
     user = "joepip699@gmail.com"
     msg['From'] = user
-    password = "gctn ivei flfg gdrb"
+    password = ""
 
     msg.attach(MIMEText(body, 'html'))
 
